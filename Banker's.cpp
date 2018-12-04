@@ -18,20 +18,34 @@ vector<vector<int>> calcNeed(vector<vector<int>> allocated, vector<vector<int>> 
 	return need;
 }
 
+void printArrs(vector<vector<int>>allocs, vector<vector<int>>maxRes, vector<vector<int>>needed) {
+	cout << "/////////// Side By Side ////////////" << endl;
+	cout << "// Allocated || Max || Needed //" << endl;
+	for (int i = 0; i < allocs.size; i++) {
+		for (int j = 0; j < allocs[i].size; j++) {
+			cout << allocs[i][j] << " ";
+		}
+		cout << "|| ";
+		for (int j = 1; j < allocs[i].size; j++) {
+
+			cout << maxRes[i][j] << " ";
+		}
+		cout << "|| ";
+		for (int j = 1; j < allocs[i].size; j++) {
+
+			cout << needed[i][j] << " ";
+		}
+		cout << endl;
+
+	}
+}
+
 
 tuple<bool, vector<vector<int>>> isSafe(vector<vector<int>> allocated, vector<vector<int>> maximum, vector<int> available)
 {
 	// Calculation of needed matrix
-	vector<vector<int>> need(allocated.size());
-	for (int i = 0; i < need.size(); i++) {
-		need[i].push_back(i);
-		for (int j = 1; j < maximum[i].size(); j++) {
-			int x = maximum[i][j];
-			int y = allocated[i][j];
-			need[i].push_back(x - y);
-		}
-	}
-	auto temp = need;
+	vector<vector<int>> need = calcNeed(allocated, maximum);
+	vector<vector<int>> temp = need;
 	cout << endl << "// needed || available before || allocated || available after //" << endl;
 	// search for processes that can be executed
 	for (int i = 0; i < allocated.size(); i++) {
@@ -118,7 +132,7 @@ void project() {
 				cin >> maxRes[i][j];
 			}
 		}
-
+		
 	}
 	else {
 		for (int i = 0; i < numP; i++) {
@@ -136,36 +150,27 @@ void project() {
 			}
 		}
 	}
-	vector<vector<int>> accepted;
+	printArrs(allocs, maxRes, calcNeed(allocs, maxRes));
+	vector<int> AVAILABLE = avail;
+	vector<vector<int>> ACCEPTED(numP, vector<int>(numR, 0));
+	vector<vector<int>> ALLOCATIONS(numP, vector<int>(numR, 0));
+	vector<vector<int>> MAX_RESOURCES(numP, vector<int>(numR, 0));
 	for (int i = 0; i < numP; i++) {
-		cout << "P#" << i << " requests allocaiton";
-		for (int j = 0; j < numR; j++) {
+		cout << "P#" << i << " requests allocaiton\n";
+		vector<vector<int>> mockAllocs{ allocs[i] };
+		vector<vector<int>> mockMax{ maxRes[i] };
+		auto tempNeed = calcNeed(mockAllocs, mockMax);
+		printArrs(mockAllocs, mockMax, tempNeed);
 
-		}
+
+
 		bool safe;
+
 		vector<vector<int>> vec;
 		tie(safe, vec) = isSafe(allocs, maxRes, avail);
 	}
 
-	cout << "/////////// Side By Side ////////////" << endl;
-	cout << "// Allocated || Max || Needed //" << endl;
-	for (int i = 0; i < numP; i++) {
-		for (int j = 0; j < numR; j++) {
-			cout << allocs[i][j] << " ";
-		}
-		cout << "|| ";
-		for (int j = 1; j < numR; j++) {
 
-			cout << maxRes[i][j] << " ";
-		}
-		cout << "|| ";
-		for (int j = 1; j < numR; j++) {
-
-			cout << vec[i][j] << " ";
-		}
-		cout << endl;
-
-	}
 }
 
 
