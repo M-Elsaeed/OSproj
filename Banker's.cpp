@@ -19,19 +19,18 @@ vector<vector<int>> calcNeed(vector<vector<int>> allocated, vector<vector<int>> 
 }
 
 void printArrs(vector<vector<int>>allocs, vector<vector<int>>maxRes, vector<vector<int>>needed) {
-	cout << "/////////// Side By Side ////////////" << endl;
 	cout << "// Allocated || Max || Needed //" << endl;
-	for (int i = 0; i < allocs.size; i++) {
-		for (int j = 0; j < allocs[i].size; j++) {
+	for (int i = 0; i < allocs.size(); i++) {
+		for (int j = 0; j < allocs[i].size(); j++) {
 			cout << allocs[i][j] << " ";
 		}
 		cout << "|| ";
-		for (int j = 1; j < allocs[i].size; j++) {
+		for (int j = 1; j < allocs[i].size(); j++) {
 
 			cout << maxRes[i][j] << " ";
 		}
 		cout << "|| ";
-		for (int j = 1; j < allocs[i].size; j++) {
+		for (int j = 1; j < allocs[i].size(); j++) {
 
 			cout << needed[i][j] << " ";
 		}
@@ -41,11 +40,11 @@ void printArrs(vector<vector<int>>allocs, vector<vector<int>>maxRes, vector<vect
 }
 
 
-tuple<bool, vector<vector<int>>> isSafe(vector<vector<int>> allocated, vector<vector<int>> maximum, vector<int> available)
+bool isSafe(vector<vector<int>> allocated, vector<vector<int>> maximum, vector<int> available)
 {
 	// Calculation of needed matrix
 	vector<vector<int>> need = calcNeed(allocated, maximum);
-	vector<vector<int>> temp = need;
+	//vector<vector<int>> temp = need;
 	cout << endl << "// needed || available before || allocated || available after //" << endl;
 	// search for processes that can be executed
 	for (int i = 0; i < allocated.size(); i++) {
@@ -95,7 +94,7 @@ tuple<bool, vector<vector<int>>> isSafe(vector<vector<int>> allocated, vector<ve
 	else {
 		cout << endl << "Unsafe" << endl;
 	}
-	return make_tuple(safe, temp);
+	return safe;
 }
 
 void project() {
@@ -132,13 +131,14 @@ void project() {
 				cin >> maxRes[i][j];
 			}
 		}
-		
+
 	}
 	else {
 		for (int i = 0; i < numP; i++) {
 			maxRes[i][0] = i;
 			for (int j = 1; j < numR; j++) {
 				int x = rand() % (avail[j] + 1);
+				x *= 2;
 				maxRes[i][j] = x;
 			}
 		}
@@ -146,29 +146,55 @@ void project() {
 			allocs[i][0] = i;
 			for (int j = 1; j < numR; j++) {
 				int x = rand() % (maxRes[i][j] + 1);
+				x /= 2;
 				allocs[i][j] = x;
 			}
 		}
 	}
+	cout << "\n////////////////////// - Generated/Input Processes - //////////////////////"<<endl;
 	printArrs(allocs, maxRes, calcNeed(allocs, maxRes));
+	cout << "\n////////////////////// - End - //////////////////////"<<endl;
+
 	vector<int> AVAILABLE = avail;
-	vector<vector<int>> ACCEPTED(numP, vector<int>(numR, 0));
-	vector<vector<int>> ALLOCATIONS(numP, vector<int>(numR, 0));
-	vector<vector<int>> MAX_RESOURCES(numP, vector<int>(numR, 0));
+	vector<vector<int>> ACCEPTED(0, vector<int>(numR, 0));
+	vector<vector<int>> ALLOCATIONS(0, vector<int>(numR, 0));
+	vector<vector<int>> MAX_RESOURCES(0, vector<int>(numR, 0));
+
+
 	for (int i = 0; i < numP; i++) {
-		cout << "P#" << i << " requests allocaiton\n";
+		cout << "\nP#" << i << " requests allocaiton\n";
 		vector<vector<int>> mockAllocs{ allocs[i] };
 		vector<vector<int>> mockMax{ maxRes[i] };
 		auto tempNeed = calcNeed(mockAllocs, mockMax);
+		cout << "\n////////////////////// - Process to be tested - //////////////////////"<<endl;
 		printArrs(mockAllocs, mockMax, tempNeed);
+		cout << "\n////////////////////// - End - //////////////////////"<<endl;
 
+		mockAllocs = ALLOCATIONS;
+		mockAllocs.push_back(allocs[i]);
+		mockMax = MAX_RESOURCES;
+		mockMax.push_back(maxRes[i]);
 
-
-		bool safe;
-
-		vector<vector<int>> vec;
-		tie(safe, vec) = isSafe(allocs, maxRes, avail);
+		if (isSafe(mockAllocs, mockMax, AVAILABLE)) {
+			cout << "\nP#" << i << " Granted Allocation\n";
+			//for (int j = 1; j < numR; j++)
+			//	AVAILABLE[j] += allocs[i][j];
+			ALLOCATIONS = mockAllocs;
+			MAX_RESOURCES = mockMax;
+		}
+		else {
+			cout << "\nP#" << i << " Will lead to an unsafe state\n";
+		}
+		cout << "\n////////////////////// - After Process testing - //////////////////////"<<endl;
+		printArrs(ALLOCATIONS, MAX_RESOURCES, calcNeed(ALLOCATIONS, MAX_RESOURCES));
+		cout << "\n////////////////////// - End - //////////////////////"<<endl;
+		//vector<vector<int>> vec;
+		//tie(safe, vec) = isSafe(allocs, maxRes, avail);
 	}
+
+	cout << "\n////////////////////// - Final State of the System - //////////////////////"<<endl;
+	printArrs(ALLOCATIONS, MAX_RESOURCES, calcNeed(ALLOCATIONS, MAX_RESOURCES));
+	cout << "\n////////////////////// - End - //////////////////////"<<endl;
 
 
 }
