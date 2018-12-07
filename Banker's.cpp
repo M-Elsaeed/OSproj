@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <tuple>
 using namespace std;
 
 vector<vector<int>> calcNeed(vector<vector<int>> allocated, vector<vector<int>> maximum)
@@ -100,7 +99,7 @@ bool isSafe(vector<vector<int>> allocated, vector<vector<int>> maximum, vector<i
 void randomDisAlloc(vector<vector<int>> & allocated, vector<int> & available) {
 	int pNum = rand() % allocated.size();
 	vector<int> disallocs(available.size(), 0);
-	cout << endl << "disallocating P#"<< allocated[pNum][0] << endl;
+	cout << endl << "disallocating P#" << allocated[pNum][0] << endl;
 	for (int i = 1; i < disallocs.size(); i++) {
 		int r = rand() % (allocated[pNum][i] + 1);
 		cout << r << " ";
@@ -113,7 +112,7 @@ void randomDisAlloc(vector<vector<int>> & allocated, vector<int> & available) {
 	}
 }
 
-void project() {
+void Banker() {
 	int numP, numR, userMode, nIterations;
 	cout << "Enter 0 for random numbers and 1 for User Input" << endl;
 	cin >> userMode;
@@ -229,27 +228,21 @@ void project() {
 			cout << endl;
 			printArrs(allocs, maxRes, calcNeed(allocs, maxRes));
 			cout << "\n////////////////////// -           End          - //////////////////////" << endl;
-			//i = -1;
 		}
-
-		cout << "\n////////////////////// - Final State of the System - //////////////////////" << endl;
-		cout << endl << "available" << endl;
-		for (int j = 1; j < numR; j++) {
-			cout << avail[j] << " ";
-		}
-		cout << endl;
-		printArrs(allocs, maxRes, calcNeed(allocs, maxRes));
-		cout << "\n////////////////////// -           End             - //////////////////////" << endl;
-
-
 	}
+
+	cout << "\n////////////////////// - Final State of the System - //////////////////////" << endl;
+	cout << endl << "available" << endl;
+	for (int j = 1; j < numR; j++) {
+		cout << avail[j] << " ";
+	}
+	cout << endl;
+	printArrs(allocs, maxRes, calcNeed(allocs, maxRes));
+	cout << "\n////////////////////// -           End             - //////////////////////" << endl;
+
+
 }
 
-
-
-
-
 int main() {
-	project();
-	cout << "x";
+	Banker();
 }
