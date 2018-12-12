@@ -231,6 +231,7 @@ void Banker() {
 			cout << endl;
 			printArrs(allocs, maxRes, calcNeed(allocs, maxRes));
 			cout << "\n////////////////////// -           End          - //////////////////////" << endl;
+			
 		}
 	}
 
