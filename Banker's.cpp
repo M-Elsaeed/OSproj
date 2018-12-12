@@ -103,13 +103,14 @@ void randomDisAlloc(vector<vector<int>> & allocated, vector<int> & available) {
 	for (int i = 1; i < disallocs.size(); i++) {
 		int r = rand() % (allocated[pNum][i] + 1);
 		cout << r << " ";
+		disallocs[i] = r;
 	}
 	cout << endl;
-	cout << endl << "randomly disallocated P#" << pNum << endl;
 	for (int i = 1; i < available.size(); i++) {
 		available[i] += disallocs[i];
 		allocated[pNum][i] -= disallocs[i];
 	}
+	cout << endl << "randomly disallocated P#" << allocated[pNum][0] << endl;
 }
 
 void Banker() {
@@ -135,6 +136,7 @@ void Banker() {
 		for (int i = 0; i < numP; i++) {
 			cout << "Enter maximum number of resources needed for process#" << i << endl;
 			maxRes[i][0] = i;
+			allocs[i][0] = i;
 			for (int j = 1; j < numR; j++) {
 				cin >> maxRes[i][j];
 			}
@@ -143,6 +145,7 @@ void Banker() {
 	else {
 		for (int i = 0; i < numP; i++) {
 			maxRes[i][0] = i;
+			allocs[i][0] = i;
 			for (int j = 1; j < numR; j++) {
 				int x = rand() % (avail[j] + 1);
 				maxRes[i][j] = x;
