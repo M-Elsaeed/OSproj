@@ -325,7 +325,7 @@ int LFU(vector <int>refs, vector <int>buffer) {
 
 int secondChance(vector <int>refs, vector <int>buffer) {
 	int miss = 0;
-	vector<int>refBits;
+	vector<int>refBits(buffer.size(),0);
 	// Up to the buffer's size misses are counted assuming the buffer is initially empty
 	for (int i = 0; i < buffer.size(); i++) {
 		buffer[i] = refs[i];
@@ -336,8 +336,7 @@ int secondChance(vector <int>refs, vector <int>buffer) {
 		int index = arrSearch(buffer, refs[i]);
 		if (index < 0) {
 			miss++;
-			int j;
-			for (j = 0; j < buffer.size(); j++) {
+			for (int j = 0; j < refBits.size(); j++) {
 				if (refBits[j] == 0) {
 					buffer[j] = refs[i];
 					refBits[j] = 1;
@@ -345,7 +344,7 @@ int secondChance(vector <int>refs, vector <int>buffer) {
 				}
 				else //if (refBits[j] == 1)
 				{
-					refBits[i]--;
+					refBits[j]--;
 				}
 				if (j == buffer.size() - 1)
 					j = -1;
@@ -386,10 +385,10 @@ void Memmory() {
 	//	}
 	//}
 	//cout << "======" << endl;
-	cout << endl << "FIFO : " << FIFO(refs, buffer) << endl;
-	cout << endl << "LRU : " << LRU(refs, buffer) << endl;
-	cout << endl << "LFU : " << LFU(refs, buffer) << endl;
-	cout << endl << "secondChance : " << secondChance(refs, buffer) << endl;
+	cout << endl << "FIFO : " << FIFO(refs, buffer) << endl;//Verified
+	cout << endl << "LRU : " << LRU(refs, buffer) << endl;//Verified
+	cout << endl << "LFU : " << LFU(refs, buffer) << endl;//Mo7a
+	cout << endl << "secondChance : " << secondChance(refs, buffer) << endl;//Verify
 	cout << endl << "enhancedSecondChance : " << enhancedSecondChance(refs, buffer) << endl;
 	cout << endl << "optimal : " << optimal(refs, buffer) << endl;
 }
