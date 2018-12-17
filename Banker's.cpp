@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <queue>
+#include <algorithm>
 using namespace std;
 
 vector<vector<int>> calcNeed(vector<vector<int>> allocated, vector<vector<int>> maximum)
@@ -231,7 +233,7 @@ void Banker() {
 			cout << endl;
 			printArrs(allocs, maxRes, calcNeed(allocs, maxRes));
 			cout << "\n////////////////////// -           End          - //////////////////////" << endl;
-			
+
 		}
 	}
 
@@ -247,6 +249,152 @@ void Banker() {
 
 }
 
+int arrSearch(vector<int> arr, int val) {
+	auto it = find(arr.begin(), arr.end(), val);
+	if (it != arr.end()) {
+		return (it - arr.begin());
+	}
+	return -1;
+}
+
+
+int FIFO(vector <int>refs, vector <int>buffer) {
+	int miss = 0;
+	queue <int> Q;
+	// Up to the buffer's size misses are counted assuming the buffer is initially empty
+	for (int i = 0; i < buffer.size(); i++) {
+		buffer[i] = refs[i];
+		miss++;
+		Q.push(refs[i]);
+	}
+	for (int i = buffer.size(); i < refs.size(); i++) {
+		int index = arrSearch(buffer, refs[i]);
+		// not found
+		if (index < 0) {
+			miss++;
+			buffer[arrSearch(buffer, Q.front())] = refs[i];
+			Q.pop();
+			Q.push(refs[i]);
+		}
+	}
+	return miss;
+}
+
+int LRU(vector <int>refs, vector <int>buffer) {
+	int miss = 0;
+	vector<int>lastUsed;
+	// Up to the buffer's size misses are counted assuming the buffer is initially empty
+	for (int i = 0; i < buffer.size(); i++) {
+		buffer[i] = refs[i];
+		miss++;
+		// if page already referenced before bring it to the top of the vector lastUsed
+		// else just pushback
+		int ru = arrSearch(lastUsed, refs[i]);
+		if (ru >= 0) {
+			lastUsed.erase(lastUsed.begin() + ru);
+		}
+		lastUsed.push_back(refs[i]);
+	}
+	for (int i = buffer.size(); i < refs.size(); i++) {
+		if (lastUsed.size() > buffer.size()) {
+			for (int j = 0; j < lastUsed.size() - buffer.size(); j++) {
+				lastUsed.erase(lastUsed.begin() + j);
+
+			}
+		}
+		if (arrSearch(buffer, refs[i]) < 0) {
+			buffer[arrSearch(buffer, lastUsed[0])] = refs[i];
+			miss++;
+		}
+		// if page already referenced before bring it to the top of the vector lastUsed
+		// else just pushback
+		int ru = arrSearch(lastUsed, refs[i]);
+		if (ru >= 0) {
+			lastUsed.erase(lastUsed.begin() + ru);
+		}
+		lastUsed.push_back(refs[i]);
+
+	}
+	return miss;
+}
+
+int LFU(vector <int>refs, vector <int>buffer) {
+	return 0;
+}
+
+
+int secondChance(vector <int>refs, vector <int>buffer) {
+	int miss = 0;
+	vector<int>refBits;
+	// Up to the buffer's size misses are counted assuming the buffer is initially empty
+	for (int i = 0; i < buffer.size(); i++) {
+		buffer[i] = refs[i];
+		refBits[i] = 1;
+		miss++;
+	}
+	for (int i = buffer.size(); i < refs.size(); i++) {
+		int index = arrSearch(buffer, refs[i]);
+		if (index < 0) {
+			miss++;
+			int j;
+			for (j = 0; j < buffer.size(); j++) {
+				if (refBits[j] == 0) {
+					buffer[j] = refs[i];
+					refBits[j] = 1;
+					break;
+				}
+				else //if (refBits[j] == 1)
+				{
+					refBits[i]--;
+				}
+				if (j == buffer.size() - 1)
+					j = -1;
+			}
+
+		}
+		else {
+			refBits[index] = 1;
+		}
+
+	}
+	return miss;
+}
+
+
+int enhancedSecondChance(vector <int>refs, vector <int>buffer) {
+	return 0;
+}
+
+
+int optimal(vector <int>refs, vector <int>buffer) {
+	return 0;
+}
+
+
+void Memmory() {
+	vector <int>refs{ 7,0,1,2,0,3,0,4,2,3,0,3,0,3,2,1,2,0,1,7,0,1 };
+	vector<int>buffer{ -1,-1,-1 };//(rand() % (20) + 1, -1);
+	//cout << "Refereced Pages " << endl;
+	//cout << "======" << endl;
+	//for (int i = 0; i < 100; i++) {
+	//	refs.push_back(rand() % 100);
+	//	if (refs[i] > 9) {
+	//		cout << "| " << refs[i] << " |" << endl;
+	//	}
+	//	else {
+	//		cout << "| " << refs[i] << "  |" << endl;
+	//	}
+	//}
+	//cout << "======" << endl;
+	cout << endl << "FIFO : " << FIFO(refs, buffer) << endl;
+	cout << endl << "LRU : " << LRU(refs, buffer) << endl;
+	cout << endl << "LFU : " << LFU(refs, buffer) << endl;
+	cout << endl << "secondChance : " << secondChance(refs, buffer) << endl;
+	cout << endl << "enhancedSecondChance : " << enhancedSecondChance(refs, buffer) << endl;
+	cout << endl << "optimal : " << optimal(refs, buffer) << endl;
+}
+
+
 int main() {
-	Banker();
+	Memmory();
 }
