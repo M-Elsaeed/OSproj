@@ -322,10 +322,9 @@ int LFU(vector <int>refs, vector <int>buffer) {
 	return 0;
 }
 
-
 int secondChance(vector <int>refs, vector <int>buffer) {
 	int miss = 0;
-	vector<int>refBits(buffer.size(),0);
+	vector<int>refBits(buffer.size(), 0);
 	// Up to the buffer's size misses are counted assuming the buffer is initially empty
 	for (int i = 0; i < buffer.size(); i++) {
 		buffer[i] = refs[i];
@@ -359,19 +358,50 @@ int secondChance(vector <int>refs, vector <int>buffer) {
 	return miss;
 }
 
-
 int enhancedSecondChance(vector <int>refs, vector <int>buffer) {
 	return 0;
 }
 
-
 int optimal(vector <int>refs, vector <int>buffer) {
-	return 0;
+	int miss = 0;
+	// Up to the buffer's size misses are counted assuming the buffer is initially empty
+	for (int i = 0; i < buffer.size(); i++) {
+		buffer[i] = refs[i];
+		miss++;
+	}
+	for (int i = buffer.size(); i < refs.size(); i++) {
+		int index = arrSearch(buffer, refs[i]);
+		if (index < 0) {
+			miss++;
+			int buffInd = 0;
+			int refsInd = i + 1;
+			for (int j = 0; j < buffer.size(); j++) {
+				int k;
+				for (k = i + 1; k < refs.size(); k++) {
+					if (buffer[j] == refs[k])
+					{
+						if (k > refsInd)
+						{
+							refsInd = k;
+							buffInd = j;
+						}
+						break;
+					}
+				}
+				if (k == refs.size()) {
+					refsInd = k;
+					buffInd = j;
+				}
+			}
+			buffer[buffInd] = refs[i];
+		}
+
+	}
+	return miss;
 }
 
-
 void Memmory() {
-	vector <int>refs{ 7,0,1,2,0,3,0,4,2,3,0,3,0,3,2,1,2,0,1,7,0,1 };
+	vector <int>refs{ 7,0,1,2,0,3,0,4,2,3,0,3,2,1,2,0,1,7,0,1 };
 	vector<int>buffer{ -1,-1,-1 };//(rand() % (20) + 1, -1);
 	//cout << "Refereced Pages " << endl;
 	//cout << "======" << endl;
@@ -388,11 +418,10 @@ void Memmory() {
 	cout << endl << "FIFO : " << FIFO(refs, buffer) << endl;//Verified
 	cout << endl << "LRU : " << LRU(refs, buffer) << endl;//Verified
 	cout << endl << "LFU : " << LFU(refs, buffer) << endl;//Mo7a
-	cout << endl << "secondChance : " << secondChance(refs, buffer) << endl;//Verify
+	cout << endl << "secondChance : " << secondChance(refs, buffer) << endl;//Verified
 	cout << endl << "enhancedSecondChance : " << enhancedSecondChance(refs, buffer) << endl;
-	cout << endl << "optimal : " << optimal(refs, buffer) << endl;
+	cout << endl << "optimal : " << optimal(refs, buffer) << endl;//Verified
 }
-
 
 int main() {
 	Memmory();
