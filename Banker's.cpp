@@ -341,7 +341,7 @@ int secondChance(vector <int>refs, vector <int>buffer) {
 	vector<int>refBits(buffer.size(), 0);
 	vector <int> Q;
 	for (int i = 0; i < refs.size(); i++) {
-
+		cout << "refeering" << refs[i] << endl;
 		int empty = arrSearch(buffer, -1);
 		int index = arrSearch(buffer, refs[i]);
 		if (empty >= 0 && index < 0) {
@@ -351,51 +351,41 @@ int secondChance(vector <int>refs, vector <int>buffer) {
 			Q.push_back(refs[i]);
 		}
 		else if (index < 0) {
-			//int index2 = 0;
-			//while (Q.size() > 0) {
-			//	index2 = arrSearch(buffer, Q[0]);
-			//	if (index2 < 0) {
-			//		Q.erase(Q.begin());
-			//	}
-			//	else {
-			//		break;
-			//	}
-			//}
 			miss++;
-			for (int m = 0; m < Q.size(); m++) {
-				int j = arrSearch(buffer, Q[0 + m]);
-				if (refBits[j] == 0) {
-					while (arrSearch(Q, buffer[j]) >= 0) {
-						Q.erase(Q.begin() + arrSearch(Q, buffer[j]));
+			while (true) {
+				int nxtVictim = arrSearch(buffer, Q[0]);
+				if (refBits[nxtVictim] == 0) {
+					while (arrSearch(Q, buffer[nxtVictim]) >= 0) {
+						Q.erase(Q.begin() + arrSearch(Q, buffer[nxtVictim]));
 					}
-					buffer[j] = refs[i];
-					refBits[j] = 0;
 					Q.push_back(refs[i]);
+					buffer[nxtVictim] = refs[i];
+					refBits[nxtVictim] = 0;
 					break;
 				}
 				else //if (refBits[j] == 1)
 				{
-					refBits[j] = 0;
+					refBits[nxtVictim] = 0;
+					while (arrSearch(Q, buffer[nxtVictim]) >= 0) {
+						Q.erase(Q.begin() + arrSearch(Q, buffer[nxtVictim]));
+					}
+					Q.push_back(buffer[nxtVictim]);
 				}
-				//if (j == buffer.size() - 1)
-				//	j = -1;
 			}
-
 		}
 		else {
 			refBits[index] = 1;
 		}
 
-
-		cout << endl << "/////////////////////" << endl;
-		for (int m = 0; m < refBits.size(); m++)
-			cout << refBits[m] << " ";
-		cout << endl;
-		for (int m = 0; m < buffer.size(); m++)
-			cout << buffer[m] << " ";
-		cout << endl;
+		cout << endl << "/////////////////////" << endl << "Que : ";
 		for (int m = 0; m < Q.size(); m++)
 			cout << Q[m] << " ";
+		cout << endl << endl << endl << "Mem : ";
+		for (int m = 0; m < buffer.size(); m++)
+			cout << buffer[m] << " ";
+		cout << endl << "Ref : ";
+		for (int m = 0; m < refBits.size(); m++)
+			cout << refBits[m] << " ";
 		cout << endl << "/////////////////////" << endl;
 
 	}
@@ -446,8 +436,8 @@ int optimal(vector <int>refs, vector <int>buffer) {
 }
 
 void Memmory() {
-	vector <int>refs{ 7,0,1,2,0,3,0,4,2,3,0,3,2,1,2,0,1,7,0,1 };//{ 1,2,3,4,1,3,6,2,1,5,3,7,6,3,2,1,2,3,4,6 };//{ 1,2,3,4,1,3,6,2,1,5,3,7,6,3,2,1,2,3,4,6 };//{ 7,0,1,2,0,3,0,4,2,3,0,3,2,1,2,0,1,7,0,1 };//{ 2,3,2,1,5,2,4,5,3,2,5,2 };
-	vector<int>buffer{ -1,-1,-1 };//(rand() % (20) + 1, -1);
+	vector <int>refs{ 1,2,3,4,1,3,6,2,1,5,3,7,6,3,2,1,2,3,4,6 };//{ 1,2,3,4,1,3,6,2,1,5,3,7,6,3,2,1,2,3,4,6 };//{ 7,0,1,2,0,3,0,4,2,3,0,3,2,1,2,0,1,7,0,1 };//{ 2,3,2,1,5,2,4,5,3,2,5,2 };
+	vector<int>buffer{ -1,-1,-1,-1 };//(rand() % (20) + 1, -1);
 	//cout << "Refereced Pages " << endl;
 	//cout << "======" << endl;
 	//for (int i = 0; i < 100; i++) {
