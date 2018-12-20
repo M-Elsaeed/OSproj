@@ -348,6 +348,7 @@ int secondChance(vector <int>refs, vector <int>buffer) {
 			miss++;
 			buffer[empty] = refs[i];
 			refBits[empty] = 0;
+			//refBits[empty] = 1;
 			Q.push_back(refs[i]);
 		}
 		else if (index < 0) {
@@ -361,6 +362,7 @@ int secondChance(vector <int>refs, vector <int>buffer) {
 					Q.push_back(refs[i]);
 					buffer[nxtVictim] = refs[i];
 					refBits[nxtVictim] = 0;
+					//refBits[nxtVictim] = 1;
 					break;
 				}
 				else //if (refBits[j] == 1)
@@ -393,7 +395,25 @@ int secondChance(vector <int>refs, vector <int>buffer) {
 }
 
 int enhancedSecondChance(vector <int>refs, vector <int>buffer) {
-	return 0;
+	int miss = 0;
+	vector<int>refBits(buffer.size(), 0);
+	vector<int>modBits(buffer.size(), 0);
+	// 00, 01, 10, 11
+	vector <int> Q;
+	for (int i = 0; i < refs.size(); i++) {
+		int index = arrSearch(buffer, refs[i]);
+		int empty = arrSearch(buffer, -1);
+		if (empty >= 0 && index < 0) {
+
+		}
+		else if (index < 0) {
+
+		}
+		else {
+
+		}
+	}
+	return miss;
 }
 
 int optimal(vector <int>refs, vector <int>buffer) {
@@ -436,7 +456,7 @@ int optimal(vector <int>refs, vector <int>buffer) {
 }
 
 void Memmory() {
-	vector <int>refs{ 1,2,3,4,1,3,6,2,1,5,3,7,6,3,2,1,2,3,4,6 };//{ 1,2,3,4,1,3,6,2,1,5,3,7,6,3,2,1,2,3,4,6 };//{ 7,0,1,2,0,3,0,4,2,3,0,3,2,1,2,0,1,7,0,1 };//{ 2,3,2,1,5,2,4,5,3,2,5,2 };
+	vector <int>refs{ 0,1,3,6,2,4,5,2,5,0,3,1,2,5,4,1,0 };//{ 1,2,3,4,1,3,6,2,1,5,3,7,6,3,2,1,2,3,4,6 };//{ 7,0,1,2,0,3,0,4,2,3,0,3,2,1,2,0,1,7,0,1 };//{ 2,3,2,1,5,2,4,5,3,2,5,2 };
 	vector<int>buffer{ -1,-1,-1,-1 };//(rand() % (20) + 1, -1);
 	//cout << "Refereced Pages " << endl;
 	//cout << "======" << endl;
@@ -449,7 +469,7 @@ void Memmory() {
 	//		cout << "| " << refs[i] << "  |" << endl;
 	//	}
 	//}
-	cout << "======" << endl;
+	//cout << "======" << endl;
 	cout << endl << "FIFO : " << FIFO(refs, buffer) << endl;//Verified
 	cout << endl << "LRU : " << LRU(refs, buffer) << endl;//Verified
 	cout << endl << "LFU : " << LFU(refs, buffer) << endl;//Verify
