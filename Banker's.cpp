@@ -265,7 +265,7 @@ int FIFO(vector <int>refs, vector <int>buffer) {
 		int empty = arrSearch(buffer, -1);
 		int index = arrSearch(buffer, refs[i]);
 		if (empty >= 0 && index < 0) {
-			buffer[i] = refs[i];
+			buffer[empty] = refs[i];
 			miss++;
 			Q.push(refs[i]);
 		}
@@ -294,7 +294,7 @@ int LRU(vector <int>refs, vector <int>buffer) {
 		int empty = arrSearch(buffer, -1);
 		int index = arrSearch(buffer, refs[i]);
 		if (empty >= 0 && index < 0) {
-			buffer[i] = refs[i];
+			buffer[empty] = refs[i];
 			miss++;
 		}
 		else if (index < 0) {
@@ -320,9 +320,8 @@ int LFU(vector <int>refs, vector <int>buffer) {
 		int index = arrSearch(buffer, refs[i]);
 		int empty = arrSearch(buffer, -1);
 		if (empty >= 0 && index < 0) {
-			buffer[empty] = refs[i];
-			freq[refs[i]]++;
 			miss++;
+			buffer[empty] = refs[i];
 		}
 		else if (index < 0) {
 			miss++;
@@ -346,8 +345,8 @@ int secondChance(vector <int>refs, vector <int>buffer) {
 		int empty = arrSearch(buffer, -1);
 		int index = arrSearch(buffer, refs[i]);
 		if (empty >= 0 && index < 0) {
-			buffer[empty] = refs[i];
 			miss++;
+			buffer[empty] = refs[i];
 			refBits[empty] = 0;
 			Q.push_back(refs[i]);
 		}
