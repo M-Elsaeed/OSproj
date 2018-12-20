@@ -320,7 +320,7 @@ int LRU(vector <int>refs, vector <int>buffer) {
 
 int LFU(vector <int>refs, vector <int>buffer) {
 	int miss = 0;
-	vector <int> freq (100,0);
+	vector <int> freq(100, 0);
 	// Up to the buffer's size misses are counted assuming the buffer is initially empty
 	for (int i = 0; i < buffer.size(); i++) {
 		buffer[i] = refs[i];
@@ -346,20 +346,33 @@ int LFU(vector <int>refs, vector <int>buffer) {
 int secondChance(vector <int>refs, vector <int>buffer) {
 	int miss = 0;
 	vector<int>refBits(buffer.size(), 0);
+	vector <int> Q;
 	// Up to the buffer's size misses are counted assuming the buffer is initially empty
 	for (int i = 0; i < buffer.size(); i++) {
 		buffer[i] = refs[i];
-		refBits[i] = 1;
+		refBits[i] = 0;
 		miss++;
+		Q.push_back(refs[i]);
 	}
 	for (int i = buffer.size(); i < refs.size(); i++) {
 		int index = arrSearch(buffer, refs[i]);
 		if (index < 0) {
 			miss++;
-			for (int j = 0; j < refBits.size(); j++) {
+			int index2=0;
+			while (Q.size()>0) {
+				index2 = arrSearch(buffer, Q[0]);
+				if (index2 < 0) {
+					Q.erase(Q.begin());
+				}
+				else {
+					break;
+				}
+			}
+			for (int j = index2; j < refBits.size(); j++) {
 				if (refBits[j] == 0) {
+					Q.push_back(refs[i]);
 					buffer[j] = refs[i];
-					refBits[j] = 1;
+					refBits[j] = 0;
 					break;
 				}
 				else //if (refBits[j] == 1)
@@ -422,8 +435,8 @@ int optimal(vector <int>refs, vector <int>buffer) {
 }
 
 void Memmory() {
-	vector <int>refs{ 7,0,1,2,0,3,0,4,2,3,0,3,2,1,2,0,1,7,0,1 };
-	vector<int>buffer{ -1,-1,-1 };//(rand() % (20) + 1, -1);
+	vector <int>refs{ 1,2,3,4,1,3,6,2,1,5,3,7,6,3,2,1,2,3,4,6 };//{ 7,0,1,2,0,3,0,4,2,3,0,3,2,1,2,0,1,7,0,1 };
+	vector<int>buffer{ -1,-1,-1,-1 };//(rand() % (20) + 1, -1);
 	//cout << "Refereced Pages " << endl;
 	//cout << "======" << endl;
 	//for (int i = 0; i < 100; i++) {
