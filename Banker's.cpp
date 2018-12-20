@@ -262,13 +262,19 @@ int FIFO(vector <int>refs, vector <int>buffer) {
 	int miss = 0;
 	queue <int> Q;
 	// Up to the buffer's size misses are counted assuming the buffer is initially empty
+
 	for (int i = 0; i < buffer.size(); i++) {
 		buffer[i] = refs[i];
 		miss++;
 		Q.push(refs[i]);
 	}
-	for (int i = buffer.size(); i < refs.size(); i++) {
+	for (int i = 0; i < refs.size(); i++) {
+		int empty = arrSearch(buffer, -1);
 		int index = arrSearch(buffer, refs[i]);
+		if (empty >= 0 && index < 0) {
+			buffer[i] = refs[i];
+			miss++;
+		}
 		// not found
 		if (index < 0) {
 			miss++;
@@ -283,26 +289,21 @@ int FIFO(vector <int>refs, vector <int>buffer) {
 int LRU(vector <int>refs, vector <int>buffer) {
 	int miss = 0;
 	vector<int>lastUsed;
-	// Up to the buffer's size misses are counted assuming the buffer is initially empty
-	for (int i = 0; i < buffer.size(); i++) {
-		buffer[i] = refs[i];
-		miss++;
-		// if page already referenced before bring it to the top of the vector lastUsed
-		// else just pushback
-		int ru = arrSearch(lastUsed, refs[i]);
-		if (ru >= 0) {
-			lastUsed.erase(lastUsed.begin() + ru);
-		}
-		lastUsed.push_back(refs[i]);
-	}
-	for (int i = buffer.size(); i < refs.size(); i++) {
+	
+	for (int i = 0; i < refs.size(); i++) {
 		if (lastUsed.size() > buffer.size()) {
 			for (int j = 0; j < lastUsed.size() - buffer.size(); j++) {
 				lastUsed.erase(lastUsed.begin() + j);
 
 			}
 		}
-		if (arrSearch(buffer, refs[i]) < 0) {
+		int empty = arrSearch(buffer, -1);
+		int index = arrSearch(buffer, refs[i]);
+		if (empty >= 0 && index < 0) {
+			buffer[i] = refs[i];
+			miss++;
+		}
+		else if (index < 0) {
 			buffer[arrSearch(buffer, lastUsed[0])] = refs[i];
 			miss++;
 		}
@@ -321,16 +322,15 @@ int LRU(vector <int>refs, vector <int>buffer) {
 int LFU(vector <int>refs, vector <int>buffer) {
 	int miss = 0;
 	vector <int> freq(100, 0);
-	// Up to the buffer's size misses are counted assuming the buffer is initially empty
-	for (int i = 0; i < buffer.size(); i++) {
-		buffer[i] = refs[i];
-		freq[refs[i]]++;
-		miss++;
-	}
-	for (int i = buffer.size(); i < refs.size(); i++) {
+	for (int i = 0; i < refs.size(); i++) {
 		int index = arrSearch(buffer, refs[i]);
-		// not found
-		if (index < 0) {
+		int empty = arrSearch(buffer, -1);
+		if (empty >= 0 && index < 0) {
+			buffer[empty] = refs[i];
+			freq[refs[i]]++;
+			miss++;
+		}
+		else if (index < 0) {
 			miss++;
 			int buffInd = 0;
 			for (int j = 0; j < buffer.size(); j++) {
@@ -347,46 +347,77 @@ int secondChance(vector <int>refs, vector <int>buffer) {
 	int miss = 0;
 	vector<int>refBits(buffer.size(), 0);
 	vector <int> Q;
-	// Up to the buffer's size misses are counted assuming the buffer is initially empty
-	for (int i = 0; i < buffer.size(); i++) {
-		buffer[i] = refs[i];
-		refBits[i] = 0;
-		miss++;
-		Q.push_back(refs[i]);
-	}
-	for (int i = buffer.size(); i < refs.size(); i++) {
+	for (int i = 0; i < refs.size(); i++) {
+
+		int empty = arrSearch(buffer, -1);
 		int index = arrSearch(buffer, refs[i]);
-		if (index < 0) {
+		if (empty >= 0 && index < 0) {
+			buffer[empty] = refs[i];
 			miss++;
-			int index2=0;
-			while (Q.size()>0) {
-				index2 = arrSearch(buffer, Q[0]);
-				if (index2 < 0) {
-					Q.erase(Q.begin());
-				}
-				else {
-					break;
-				}
-			}
-			for (int j = index2; j < refBits.size(); j++) {
+			refBits[empty] = 0;
+			Q.push_back(refs[i]);
+
+			cout << endl << "/////////////////////" << endl;
+			for (int m = 0; m < refBits.size(); m++)
+				cout << refBits[m] << " ";
+			cout << endl;
+			for (int m = 0; m < buffer.size(); m++)
+				cout << buffer[m] << " ";
+			cout << endl;
+			for (int m = 0; m < Q.size(); m++)
+				cout << Q[m] << " ";
+			cout << endl << "/////////////////////" << endl;
+
+
+			continue;
+		}
+		else if (index < 0) {
+			//int index2 = 0;
+			//while (Q.size() > 0) {
+			//	index2 = arrSearch(buffer, Q[0]);
+			//	if (index2 < 0) {
+			//		Q.erase(Q.begin());
+			//	}
+			//	else {
+			//		break;
+			//	}
+			//}
+			miss++;
+			for (int m = 0; m < Q.size(); m++) {
+				int j = arrSearch(buffer, Q[0 + m]);
 				if (refBits[j] == 0) {
-					Q.push_back(refs[i]);
+					while (arrSearch(Q, buffer[j]) >= 0) {
+						Q.erase(Q.begin() + arrSearch(Q, buffer[j]));
+					}
 					buffer[j] = refs[i];
 					refBits[j] = 0;
+					Q.push_back(refs[i]);
 					break;
 				}
 				else //if (refBits[j] == 1)
 				{
-					refBits[j]--;
+					refBits[j] = 0;
 				}
-				if (j == buffer.size() - 1)
-					j = -1;
+				//if (j == buffer.size() - 1)
+				//	j = -1;
 			}
 
 		}
 		else {
 			refBits[index] = 1;
 		}
+
+
+		cout << endl << "/////////////////////" << endl;
+		for (int m = 0; m < refBits.size(); m++)
+			cout << refBits[m] << " ";
+		cout << endl;
+		for (int m = 0; m < buffer.size(); m++)
+			cout << buffer[m] << " ";
+		cout << endl;
+		for (int m = 0; m < Q.size(); m++)
+			cout << Q[m] << " ";
+		cout << endl << "/////////////////////" << endl;
 
 	}
 	return miss;
@@ -399,13 +430,14 @@ int enhancedSecondChance(vector <int>refs, vector <int>buffer) {
 int optimal(vector <int>refs, vector <int>buffer) {
 	int miss = 0;
 	// Up to the buffer's size misses are counted assuming the buffer is initially empty
-	for (int i = 0; i < buffer.size(); i++) {
-		buffer[i] = refs[i];
-		miss++;
-	}
-	for (int i = buffer.size(); i < refs.size(); i++) {
+	for (int i = 0; i < refs.size(); i++) {
 		int index = arrSearch(buffer, refs[i]);
-		if (index < 0) {
+		int empty = arrSearch(buffer, -1);
+		if (empty >= 0 && index < 0) {
+			buffer[empty] = refs[i];
+			miss++;
+		}
+		else if (index < 0) {
 			miss++;
 			int buffInd = 0;
 			int refsInd = i + 1;
@@ -435,8 +467,8 @@ int optimal(vector <int>refs, vector <int>buffer) {
 }
 
 void Memmory() {
-	vector <int>refs{ 1,2,3,4,1,3,6,2,1,5,3,7,6,3,2,1,2,3,4,6 };//{ 7,0,1,2,0,3,0,4,2,3,0,3,2,1,2,0,1,7,0,1 };
-	vector<int>buffer{ -1,-1,-1,-1 };//(rand() % (20) + 1, -1);
+	vector <int>refs{ 7,0,1,2,0,3,0,4,2,3,0,3,2,1,2,0,1,7,0,1 };//{ 1,2,3,4,1,3,6,2,1,5,3,7,6,3,2,1,2,3,4,6 };//{ 1,2,3,4,1,3,6,2,1,5,3,7,6,3,2,1,2,3,4,6 };//{ 7,0,1,2,0,3,0,4,2,3,0,3,2,1,2,0,1,7,0,1 };//{ 2,3,2,1,5,2,4,5,3,2,5,2 };
+	vector<int>buffer{ -1,-1,-1};//(rand() % (20) + 1, -1);
 	//cout << "Refereced Pages " << endl;
 	//cout << "======" << endl;
 	//for (int i = 0; i < 100; i++) {
@@ -448,7 +480,7 @@ void Memmory() {
 	//		cout << "| " << refs[i] << "  |" << endl;
 	//	}
 	//}
-	//cout << "======" << endl;
+	cout << "======" << endl;
 	cout << endl << "FIFO : " << FIFO(refs, buffer) << endl;//Verified
 	cout << endl << "LRU : " << LRU(refs, buffer) << endl;//Verified
 	cout << endl << "LFU : " << LFU(refs, buffer) << endl;//Verify
