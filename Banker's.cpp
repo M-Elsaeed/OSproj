@@ -329,9 +329,20 @@ int LFU(vector <int>refs, vector <int>buffer) {
 			for (int j = 0; j < buffer.size(); j++) {
 				buffInd = freq[buffer[j]] < freq[buffer[buffInd]] ? j : buffInd;
 			}
-			buffer[buffInd] = refs[i];
+			buffer[buffInd] = refs[i];//resetting counter after removing?
+			freq[buffer[buffInd]] = 0;
 		}
 		freq[refs[i]]++;
+		cout << endl << "/////////////////////" << endl << "Mem : ";
+		for (int m = 0; m < buffer.size(); m++)
+			cout << buffer[m] << " ";
+		cout << endl << "Num : ";
+		for (int m = 0; m < freq.size(); m++)
+			cout << m << " ";
+		cout << endl << "frq : ";
+		for (int m = 0; m < freq.size(); m++)
+			cout << freq[m] << " ";
+		cout << endl << "/////////////////////" << endl;
 	}
 	return miss;
 }
@@ -400,56 +411,86 @@ int enhancedSecondChance(vector <int>refs, vector <int>buffer) {
 	vector<int>modBits(buffer.size(), 0);
 	// 00, 01, 10, 11
 	vector <int> Q;
+	int nxtVictim = 0;
 	for (int i = 0; i < refs.size(); i++) {
+		int modding = rand() % 2;
+		cout << endl << "referencing : " << refs[i] << "  ";
+		if (modding) {
+			cout << " MODIFYING" << endl;
+
+		}
+		else {
+			cout << " READ ONLY" << endl;
+		}
 		int index = arrSearch(buffer, refs[i]);
 		int empty = arrSearch(buffer, -1);
 		if (empty >= 0 && index < 0) {
 			miss++;
 			buffer[empty] = refs[i];
-			Q.push_back(refs[i]);
+			//Q.push_back(refs[i]);
 			refBits[empty] = 0;
 			//refBits[empty] = 1;
-			modBits[empty] = rand() % 2;//(i == 1 || i == 4 || i == 7 || i == 10 || i == 13 || i == 16) ? 1 : 0;
+			modBits[empty] = (i == 0 || i == 9 || i == 16 || i == 2 || i == 10 || i == 6 || i == 8 || i == 13) ? 1 : 0;//modding;
+			nxtVictim = empty + 1 == buffer.size() ? 0 : empty + 1;
 		}
 		else if (index < 0) {
 			miss++;
-			bool found = false;
-			while (!found) {
-				// Q.size();
-				for (int x = 0; x < Q.size(); x++) {
-					int nxtVictim = arrSearch(buffer, Q[x]);
-					if (refBits[nxtVictim] == 0 && modBits[nxtVictim] == 0) {
-						while (arrSearch(Q, buffer[nxtVictim]) >= 0) {
-							Q.erase(Q.begin() + arrSearch(Q, buffer[nxtVictim]));
-						}
-						Q.push_back(refs[i]);
-						buffer[nxtVictim] = refs[i];
-						refBits[nxtVictim] = 0;
-						//refBits[nxtVictim] = 1;
-						modBits[nxtVictim] = rand() % 2;// (i == 1 || i == 4 || i == 7 || i == 10 || i == 13 || i == 16) ? 1 : 0;
-						found = true;
-						break;
-					}
+			//bool found = false;
+			//while (!found) {
+			//	// Q.size();
+			bool reset = false, found = false;
+			while (nxtVictim < buffer.size()) {
+				if (refBits[nxtVictim] == 0 && modBits[nxtVictim] == 0) {
+					//while (arrSearch(Q, buffer[nxtVictim]) >= 0) {
+					//	Q.erase(Q.begin() + arrSearch(Q, buffer[nxtVictim]));
+					//}
+					//Q.push_back(refs[i]);
+					buffer[nxtVictim] = refs[i];
+					refBits[nxtVictim] = 0;
+					//refBits[nxtVictim] = 1;
+					modBits[nxtVictim] = (i == 0 || i == 9 || i == 16 || i == 2 || i == 10 || i == 6 || i == 8 || i == 13) ? 1 : 0;//modding;
+					found = true;
+					nxtVictim = nxtVictim + 1 == buffer.size() ? 0 : nxtVictim + 1;
+					break;
 				}
-				for (int x = 0; x < Q.size() && (!found); x++) {
-					int nxtVictim = arrSearch(buffer, Q[x]);
-					if (refBits[nxtVictim] == 0 && modBits[nxtVictim] == 1) {
-						while (arrSearch(Q, buffer[nxtVictim]) >= 0) {
-							Q.erase(Q.begin() + arrSearch(Q, buffer[nxtVictim]));
-						}
-						Q.push_back(refs[i]);
-						buffer[nxtVictim] = refs[i];
-						refBits[nxtVictim] = 0;
-						//refBits[nxtVictim] = 1;
-						modBits[nxtVictim] = rand() % 2; //(i == 1 || i == 4 || i == 7 || i == 10 || i == 13 || i == 16) ? 1 : 0;
-						found = true;
-						break;
-					}
-					else if (refBits[nxtVictim] == 1)
-					{
-						refBits[nxtVictim] = 0;
-					}
+				if (!reset) {
+					nxtVictim = nxtVictim + 1 == buffer.size() ? 0 : nxtVictim + 1;
+					reset = true;
 				}
+				else {
+					nxtVictim++;
+				}
+			}
+			reset = false;
+			if ((!found) && nxtVictim == buffer.size())
+				nxtVictim = 0;
+			while ((!found) && nxtVictim < buffer.size()) {
+
+				if (refBits[nxtVictim] == 0 && modBits[nxtVictim] == 1) {
+					//while (arrSearch(Q, buffer[nxtVictim]) >= 0) {
+					//	Q.erase(Q.begin() + arrSearch(Q, buffer[nxtVictim]));
+					//}
+					//Q.push_back(refs[i]);
+					buffer[nxtVictim] = refs[i];
+					refBits[nxtVictim] = 0;
+					//refBits[nxtVictim] = 1;
+					modBits[nxtVictim] = (i == 0 || i == 9 || i == 16 || i == 2 || i == 10 || i == 6 || i == 8 || i == 13) ? 1 : 0;//modding;
+					found = true;
+					nxtVictim = nxtVictim + 1 == buffer.size() ? 0 : nxtVictim + 1;
+					break;
+				}
+				else if (refBits[nxtVictim] == 1)
+				{
+					refBits[nxtVictim] = 0;
+				}
+				if (!reset) {
+					nxtVictim = nxtVictim + 1 == buffer.size() ? 0 : nxtVictim + 1;
+					reset = true;
+				}
+				else {
+					nxtVictim++;
+				}
+
 			}
 
 			//bool all01 = true;
@@ -461,10 +502,7 @@ int enhancedSecondChance(vector <int>refs, vector <int>buffer) {
 		else {
 			refBits[index] = 1;
 		}
-		cout << endl << "/////////////////////" << endl << "Que : ";
-		for (int m = 0; m < Q.size(); m++)
-			cout << Q[m] << " ";
-		cout << endl << endl << endl << "Mem : ";
+		cout << endl << "/////////////////////" << endl << "Mem : ";
 		for (int m = 0; m < buffer.size(); m++)
 			cout << buffer[m] << " ";
 		cout << endl << "Ref : ";
@@ -532,14 +570,16 @@ void Memmory() {
 	//	}
 	//}
 	//cout << "======" << endl;
-	cout << endl << "FIFO : " << FIFO(refs, buffer) << endl;//Verified
-	cout << endl << "LRU : " << LRU(refs, buffer) << endl;//Verified
-	cout << endl << "LFU : " << LFU(refs, buffer) << endl;//Verify
-	cout << endl << "secondChance : " << secondChance(refs, buffer) << endl;//Verified
+	//cout << endl << "FIFO : " << FIFO(refs, buffer) << endl;//Verified
+	//cout << endl << "LRU : " << LRU(refs, buffer) << endl;//Verified
+	//cout << endl << "LFU : " << LFU(refs, buffer) << endl;//Verify
+	//cout << endl << "secondChance : " << secondChance(refs, buffer) << endl;//Verified
 	cout << endl << "enhancedSecondChance : " << enhancedSecondChance(refs, buffer) << endl;
-	cout << endl << "optimal : " << optimal(refs, buffer) << endl;//Verified
+	//cout << endl << "optimal : " << optimal(refs, buffer) << endl;//Verified
 }
 
 int main() {
 	Memmory();
 }
+
+
