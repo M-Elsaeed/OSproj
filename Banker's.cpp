@@ -404,14 +404,76 @@ int enhancedSecondChance(vector <int>refs, vector <int>buffer) {
 		int index = arrSearch(buffer, refs[i]);
 		int empty = arrSearch(buffer, -1);
 		if (empty >= 0 && index < 0) {
-
+			miss++;
+			buffer[empty] = refs[i];
+			Q.push_back(refs[i]);
+			refBits[empty] = 0;
+			//refBits[empty] = 1;
+			modBits[empty] = rand() % 2;//(i == 1 || i == 4 || i == 7 || i == 10 || i == 13 || i == 16) ? 1 : 0;
 		}
 		else if (index < 0) {
+			miss++;
+			bool found = false;
+			while (!found) {
+				// Q.size();
+				for (int x = 0; x < Q.size(); x++) {
+					int nxtVictim = arrSearch(buffer, Q[x]);
+					if (refBits[nxtVictim] == 0 && modBits[nxtVictim] == 0) {
+						while (arrSearch(Q, buffer[nxtVictim]) >= 0) {
+							Q.erase(Q.begin() + arrSearch(Q, buffer[nxtVictim]));
+						}
+						Q.push_back(refs[i]);
+						buffer[nxtVictim] = refs[i];
+						refBits[nxtVictim] = 0;
+						//refBits[nxtVictim] = 1;
+						modBits[nxtVictim] = rand() % 2;// (i == 1 || i == 4 || i == 7 || i == 10 || i == 13 || i == 16) ? 1 : 0;
+						found = true;
+						break;
+					}
+				}
+				for (int x = 0; x < Q.size() && (!found); x++) {
+					int nxtVictim = arrSearch(buffer, Q[x]);
+					if (refBits[nxtVictim] == 0 && modBits[nxtVictim] == 1) {
+						while (arrSearch(Q, buffer[nxtVictim]) >= 0) {
+							Q.erase(Q.begin() + arrSearch(Q, buffer[nxtVictim]));
+						}
+						Q.push_back(refs[i]);
+						buffer[nxtVictim] = refs[i];
+						refBits[nxtVictim] = 0;
+						//refBits[nxtVictim] = 1;
+						modBits[nxtVictim] = rand() % 2; //(i == 1 || i == 4 || i == 7 || i == 10 || i == 13 || i == 16) ? 1 : 0;
+						found = true;
+						break;
+					}
+					else if (refBits[nxtVictim] == 1)
+					{
+						refBits[nxtVictim] = 0;
+					}
+				}
+			}
+
+			//bool all01 = true;
+			//for (int x = 0; x < x < buffer.size(); x++) {
+			//	all01 = all01 && (refBits[x] == 0) && (modBits[x] == 0);
+			//}
 
 		}
 		else {
-
+			refBits[index] = 1;
 		}
+		cout << endl << "/////////////////////" << endl << "Que : ";
+		for (int m = 0; m < Q.size(); m++)
+			cout << Q[m] << " ";
+		cout << endl << endl << endl << "Mem : ";
+		for (int m = 0; m < buffer.size(); m++)
+			cout << buffer[m] << " ";
+		cout << endl << "Ref : ";
+		for (int m = 0; m < refBits.size(); m++)
+			cout << refBits[m] << " ";
+		cout << endl << "Mod : ";
+		for (int m = 0; m < refBits.size(); m++)
+			cout << modBits[m] << " ";
+		cout << endl << "/////////////////////" << endl;
 	}
 	return miss;
 }
