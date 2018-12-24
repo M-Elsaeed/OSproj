@@ -347,6 +347,8 @@ int enhancedSecondChance(vector<int> refs, vector<int> mem)
 		else
 		{
 			refBits[index] = 1;
+			if(modding)
+				modBits[index]=1;
 		}
 		for (int m = 0; m < mem.size(); m++)
 		{
