@@ -427,12 +427,20 @@ int optimal(vector<int> refs, vector<int> mem)
 void Memmory()
 {
 	// Input of sizing parameters
-	cout << "Please enter Memory Size less than 20. If more is entered, 20 will be used" << endl;
+	cout << "Enter Memory Size (between 1 and 20; else, 20 will be used)" << endl;
 	int memS = 0;
 	cin >> memS;
-	cout << "Please enter length of reference string" << endl;
+	memS = memS < 1 ? 20 : memS;
+	memS = memS > 20 ? 20 : memS;
+	cout << "Enter length of reference string (minimum 1; else, 20 will be used)" << endl;
 	int refLen = 0;
 	cin >> refLen;
+	refLen = refLen < 1 ? 20 : refLen;
+	cout << "Enter maximum page# to be referenced (between 2 and 100; else, 100 will be used)" << endl;
+	int maxPage = 0;
+	cin >> maxPage;
+	maxPage = maxPage < 2 ? 100 : maxPage;
+	maxPage = maxPage > 100 ? 100 : maxPage;
 	// Initializing vectors
 	vector<int> mem(memS, -1);
 	vector<int> refs(refLen, 0);
@@ -440,7 +448,7 @@ void Memmory()
 	// Generating reference string
 	cout << "Reference String : " << endl;
 	for (int i = 0; i < refs.size(); i++)
-		refs[i] = (rand() % 100);
+		refs[i] = (rand() % maxPage);
 
 	// ||FOR DEBUGGING/TESTING PURPOSES||
 	// Test Cases : just uncomment one of the lines to use the test case
@@ -449,7 +457,6 @@ void Memmory()
 	//refs = { 0,1,3,6,2,4,5,2,5,0,3,1,2,5,4,1,0 };
 	//refs = { 2,3,2,1,5,2,4,5,3,2,5,2 };
 
-	
 	for (int i = 0; i < refs.size(); i++)
 		cout << refs[i] << " ";
 	cout << endl;
