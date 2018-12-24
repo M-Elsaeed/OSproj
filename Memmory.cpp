@@ -436,11 +436,13 @@ void Memmory()
 	int refLen = 0;
 	cin >> refLen;
 	refLen = refLen < 1 ? 20 : refLen;
-	cout << "Enter maximum page# to be referenced (between 2 and 100; else, 100 will be used)" << endl;
+	cout << "Enter maximum page# to be referenced (between 1 and 99; else, 99 will be used)" << endl;
 	int maxPage = 0;
 	cin >> maxPage;
+	maxPage++;
 	maxPage = maxPage < 2 ? 100 : maxPage;
 	maxPage = maxPage > 100 ? 100 : maxPage;
+
 	// Initializing vectors
 	vector<int> mem(memS, -1);
 	vector<int> refs(refLen, 0);
